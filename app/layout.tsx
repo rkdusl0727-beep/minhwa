@@ -5,8 +5,8 @@ export const metadata: Metadata = {
   title: "민화 속 다른 곳을 찾아라!",
   description: "만 5세 유아를 위한 민화 관찰·틀린그림찾기 놀이",
   icons: {
-    icon: "/favicon.svg",
-    shortcut: "/favicon.svg",
+    icon: "/icons/brand.png",
+    shortcut: "/icons/brand.png",
   },
 };
 

@@ -17,11 +17,14 @@ export type Minhwa = {
   differences: Record<Difficulty, DifferencePoint[]>;
 };
 
-const levels = (points: DifferencePoint[]): Record<Difficulty, DifferencePoint[]> => ({
-  easy: points.slice(0, 3),
-  normal: points.slice(0, 5),
-  hard: points.slice(0, 7),
-});
+const levels = (points: DifferencePoint[]): Record<Difficulty, DifferencePoint[]> => {
+  const touchFriendlyPoints = points.map((point) => ({ ...point, radius: Math.max(point.radius, 8) }));
+  return {
+    easy: touchFriendlyPoints.slice(0, 3),
+    normal: touchFriendlyPoints.slice(0, 5),
+    hard: touchFriendlyPoints.slice(0, 7),
+  };
+};
 
 export const minhwaList: Minhwa[] = [
   {
@@ -136,7 +139,7 @@ export const talkQuestions = [
 ];
 
 export const difficultyMeta = {
-  easy: { label: "쉬움", emoji: "🌱", count: 3, note: "눈에 띄는 다른 곳 3개" },
-  normal: { label: "보통", emoji: "🌼", count: 5, note: "조금 더 살펴볼 곳 5개" },
-  hard: { label: "어려움", emoji: "🔥", count: 7, note: "꼼꼼히 찾을 곳 7개" },
-} satisfies Record<Difficulty, { label: string; emoji: string; count: number; note: string }>;
+  easy: { label: "쉬움", icon: "difficulty-easy", count: 3, note: "눈에 띄는 다른 곳 3개" },
+  normal: { label: "보통", icon: "difficulty-normal", count: 5, note: "조금 더 살펴볼 곳 5개" },
+  hard: { label: "어려움", icon: "difficulty-hard", count: 7, note: "꼼꼼히 찾을 곳 7개" },
+} satisfies Record<Difficulty, { label: string; icon: string; count: number; note: string }>;
