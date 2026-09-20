@@ -14,6 +14,64 @@ const STORAGE_KEY = "minhwa-detective-completions";
 const TOUCH_PADDING_PERCENT = 1.5;
 const MIN_TOUCH_RADIUS_PX = 26;
 
+async function makeLineArt(source: string): Promise<string> {
+  const image = new Image();
+  image.decoding = "async";
+  image.src = source;
+  await image.decode();
+
+  const longestSide = 1600;
+  const scale = Math.min(1, longestSide / Math.max(image.naturalWidth, image.naturalHeight));
+  const width = Math.max(1, Math.round(image.naturalWidth * scale));
+  const height = Math.max(1, Math.round(image.naturalHeight * scale));
+  const canvas = document.createElement("canvas");
+  const context = canvas.getContext("2d", { willReadFrequently: true });
+  if (!context) throw new Error("색칠 도안을 만들 수 없습니다.");
+
+  canvas.width = width;
+  canvas.height = height;
+  context.fillStyle = "#ffffff";
+  context.fillRect(0, 0, width, height);
+  context.drawImage(image, 0, 0, width, height);
+  const sourcePixels = context.getImageData(0, 0, width, height);
+  const gray = new Float32Array(width * height);
+  for (let pixel = 0, index = 0; index < gray.length; pixel += 4, index += 1) {
+    gray[index] = sourcePixels.data[pixel] * .299 + sourcePixels.data[pixel + 1] * .587 + sourcePixels.data[pixel + 2] * .114;
+  }
+
+  const softened = new Float32Array(gray.length);
+  for (let y = 1; y < height - 1; y += 1) {
+    for (let x = 1; x < width - 1; x += 1) {
+      let sum = 0;
+      for (let offsetY = -1; offsetY <= 1; offsetY += 1) {
+        for (let offsetX = -1; offsetX <= 1; offsetX += 1) sum += gray[(y + offsetY) * width + x + offsetX];
+      }
+      softened[y * width + x] = sum / 9;
+    }
+  }
+
+  const output = context.createImageData(width, height);
+  output.data.fill(255);
+  const valueAt = (x: number, y: number) => softened[y * width + x];
+  for (let y = 2; y < height - 2; y += 1) {
+    for (let x = 2; x < width - 2; x += 1) {
+      const gx = -valueAt(x - 1, y - 1) + valueAt(x + 1, y - 1)
+        - 2 * valueAt(x - 1, y) + 2 * valueAt(x + 1, y)
+        - valueAt(x - 1, y + 1) + valueAt(x + 1, y + 1);
+      const gy = -valueAt(x - 1, y - 1) - 2 * valueAt(x, y - 1) - valueAt(x + 1, y - 1)
+        + valueAt(x - 1, y + 1) + 2 * valueAt(x, y + 1) + valueAt(x + 1, y + 1);
+      const ink = Math.hypot(gx, gy) > 52 ? 20 : 255;
+      const position = (y * width + x) * 4;
+      output.data[position] = ink;
+      output.data[position + 1] = ink;
+      output.data[position + 2] = ink;
+      output.data[position + 3] = 255;
+    }
+  }
+  context.putImageData(output, 0, 0);
+  return canvas.toDataURL("image/png");
+}
+
 function PngIcon({ name, className = "" }: { name: string; className?: string }) {
   return <img className={`png-icon ${className}`.trim()} src={`/icons/${name}.png`} alt="" aria-hidden="true" draggable={false} />;
 }
@@ -56,10 +114,49 @@ export default function HomePage() {
   const [celebrate, setCelebrate] = useState(false);
   const [teacherOpen, setTeacherOpen] = useState(false);
   const [questionIndex, setQuestionIndex] = useState(0);
+  const [speaking, setSpeaking] = useState(false);
+  const [preparingPrint, setPreparingPrint] = useState(false);
+  const [printImage, setPrintImage] = useState<string | null>(null);
   const selected = minhwaList.find((item) => item.id === selectedId) || minhwaList[0];
   const points = selected.differences;
 
   useEffect(() => setCompleted(loadCompletions()), []);
+  useEffect(() => () => window.speechSynthesis?.cancel(), []);
+  useEffect(() => {
+    window.speechSynthesis?.cancel();
+    setSpeaking(false);
+  }, [selectedId, screen]);
+
+  const toggleNarration = () => {
+    if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
+    if (window.speechSynthesis.speaking || speaking) {
+      window.speechSynthesis.cancel();
+      setSpeaking(false);
+      return;
+    }
+    const utterance = new SpeechSynthesisUtterance(`${selected.title}. ${selected.description}`);
+    utterance.lang = "ko-KR";
+    utterance.rate = .86;
+    utterance.pitch = 1.05;
+    const koreanVoice = window.speechSynthesis.getVoices().find((voice) => voice.lang.toLowerCase().startsWith("ko"));
+    if (koreanVoice) utterance.voice = koreanVoice;
+    utterance.onend = () => setSpeaking(false);
+    utterance.onerror = () => setSpeaking(false);
+    setSpeaking(true);
+    window.speechSynthesis.speak(utterance);
+  };
+
+  const printColoringPage = async () => {
+    if (preparingPrint) return;
+    setPreparingPrint(true);
+    try {
+      const lineArt = await makeLineArt(selected.originalImage);
+      setPrintImage(lineArt);
+      window.setTimeout(() => window.print(), 180);
+    } finally {
+      setPreparingPrint(false);
+    }
+  };
 
   const chooseArtwork = (id: string) => {
     setSelectedId(id); setScreen("intro"); window.scrollTo({ top: 0, behavior: "smooth" });
@@ -147,8 +244,12 @@ export default function HomePage() {
         <BackButton label="민화 고르기" onClick={() => setScreen("select")} />
         <div className="observation-layout">
           <div className="intro-image"><img src={selected.originalImage} alt={`${selected.title} 원본 민화`} /></div>
-          <div className="intro-copy"><span className="eyebrow">먼저 그림을 천천히 봐요</span><h1>{selected.title}</h1><p>{selected.shortDescription}</p>
+          <div className="intro-copy"><span className="eyebrow">먼저 그림을 천천히 봐요</span><h1>{selected.title}</h1><p className="intro-summary">{selected.shortDescription}</p><p className="intro-description">{selected.description}</p>
             <div className="look-question"><PngIcon name="eyes" /><strong>그림 속에서 무엇이 보이나요?</strong></div>
+            <div className="intro-tools">
+              <Button variant="outline" className="large-control" onClick={toggleNarration} aria-label={speaking ? "그림 설명 그만 듣기" : "그림 설명 음성으로 듣기"}><PngIcon name={speaking ? "sound-off" : "sound-on"} /> {speaking ? "그만 듣기" : "설명 듣기"}</Button>
+              <Button variant="outline" className="large-control" onClick={printColoringPage} disabled={preparingPrint} aria-label="선택한 그림을 색칠 도안으로 인쇄하기"><PngIcon name="paintbrush" /> {preparingPrint ? "색칠 그림 만드는 중" : "색칠 그림 인쇄"}</Button>
+            </div>
             <Button className="primary-cta wide" onClick={startGame} aria-label="다른 곳 5개 찾기 시작">다른 곳 5개 찾기 <PngIcon name="arrow-right" /></Button>
           </div>
         </div>
@@ -191,6 +292,11 @@ export default function HomePage() {
         <div className="celebration-actions"><Button className="primary-cta" onClick={goLearn}><PngIcon name="book" /> 민화 더 알아보기</Button><Button variant="outline" className="large-control" onClick={() => { setCelebrate(false); setScreen("select"); }}><PngIcon name="gallery" /> 다른 민화 찾기</Button><Button variant="ghost" className="large-control" onClick={startGame}><PngIcon name="reset" /> 다시 하기</Button></div>
       </DialogContent></Dialog>
       <TeacherEditor open={teacherOpen} onOpenChange={setTeacherOpen} />
+      <section className="print-sheet" aria-label={`${selected.title} 색칠 도안`}>
+        <header><span>민화 색칠 놀이</span><h1>{selected.title}</h1></header>
+        {printImage && <img src={printImage} alt={`${selected.title} 색칠 도안`} />}
+        <p>이름: ____________________</p>
+      </section>
     </main>
   );
 }

@@ -108,10 +108,14 @@ img { max-width: 100%; }
 .observation-layout { display: grid; grid-template-columns: minmax(0,1.15fr) minmax(330px,.85fr); align-items: center; gap: clamp(36px,6vw,100px); margin-top: 28px; }
 .intro-image, .learn-image { display: grid; place-items: center; min-height: 58vh; max-height: 72vh; padding: 24px; border-radius: 28px; background: #eae2d2; box-shadow: inset 0 0 0 1px #d8d0c1; }
 .intro-image img, .learn-image img { width: 100%; height: 100%; max-height: calc(72vh - 48px); object-fit: contain; filter: drop-shadow(0 12px 14px rgba(38,45,38,.14)); }
-.intro-copy h1 { margin: 10px 0 20px; font-size: clamp(2.8rem,5vw,5.2rem); line-height: 1; letter-spacing: -.05em; }
-.intro-copy > p { margin: 0; color: #4d625c; font-size: clamp(1.25rem,2vw,1.65rem); line-height: 1.65; font-weight: 650; }
-.look-question { display: flex; align-items: center; gap: 14px; margin: 30px 0 8px; padding: 22px; border: 1px solid #e2bd77; border-radius: 20px; background: #fff1cf; color: #574326; font-size: 1.18rem; }
+.intro-copy h1 { margin: 10px 0 18px; font-size: clamp(3.4rem,6vw,6.4rem); line-height: .98; letter-spacing: -.055em; word-break: keep-all; }
+.intro-copy p { margin: 0; color: #4d625c; line-height: 1.65; }
+.intro-summary { font-size: clamp(1.3rem,2vw,1.7rem); font-weight: 750; }
+.intro-description { margin-top: 16px !important; padding: 18px 20px; border: 1px solid #d8d0c1; border-radius: 18px; background: #f6f0e4; font-size: clamp(1.05rem,1.45vw,1.25rem); font-weight: 600; }
+.look-question { display: flex; align-items: center; gap: 14px; margin: 22px 0 8px; padding: 20px; border: 1px solid #e2bd77; border-radius: 20px; background: #fff1cf; color: #574326; font-size: 1.18rem; }
 .look-question .png-icon { width: 38px; height: 38px; }
+.intro-tools { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+.intro-tools .large-control { width: 100%; background: #fffdf7; border-color: #cfc5b3; }
 
 .game-heading { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 20px; text-align: center; }
 .game-heading .back-button { justify-self: start; }
@@ -186,6 +190,7 @@ img { max-width: 100%; }
 .json-heading .png-icon { width: 18px; height: 18px; }
 .json-panel pre { min-height: 270px; max-height: 48vh; overflow: auto; margin: 14px 0; padding: 14px; border-radius: 12px; background: #0f2b29; color: #dcecc6; font-size: .85rem; line-height: 1.55; white-space: pre-wrap; }
 .copy-button { width: 100%; min-height: 54px; background: #e3b33f; color: #263c37; font-weight: 850; }
+.print-sheet { display: none; }
 
 @keyframes hint-pulse { 50% { transform: translate(-50%,-50%) scale(1.16); opacity: .7; } }
 @keyframes soft-wave { 25% { transform: translateX(-3px); } 75% { transform: translateX(3px); } }
@@ -276,6 +281,8 @@ img { max-width: 100%; }
   .card-footer strong { font-size: 1.08rem; }
   .done-badge { font-size: .7rem; }
   .intro-image, .learn-image { min-height: 390px; padding: 12px; }
+  .intro-copy h1 { font-size: clamp(3rem,13vw,4.6rem); }
+  .intro-tools { grid-template-columns: 1fr; }
   .game-heading { gap: 10px; }
   .progress-pill { min-height: 56px; padding: 8px 13px; }
   .progress-pill strong { font-size: 1.25rem; }
@@ -297,4 +304,17 @@ img { max-width: 100%; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .01ms !important; }
+}
+
+@media print {
+  @page { size: A4 portrait; margin: 0; }
+  html, body { width: 210mm; min-height: 297mm; background: #fff !important; }
+  body * { visibility: hidden !important; }
+  .print-sheet, .print-sheet * { visibility: visible !important; }
+  .print-sheet { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; width: 210mm; min-height: 297mm; padding: 12mm 14mm 10mm; overflow: hidden; background: #fff; color: #111; }
+  .print-sheet header { width: 100%; text-align: center; }
+  .print-sheet header span { font-size: 13pt; letter-spacing: .08em; }
+  .print-sheet h1 { margin: 2mm 0 5mm; font-size: 28pt; line-height: 1.1; }
+  .print-sheet img { display: block; width: 100%; height: 235mm; object-fit: contain; filter: none; }
+  .print-sheet p { align-self: flex-end; margin: 4mm 0 0; font-size: 13pt; }
 }
