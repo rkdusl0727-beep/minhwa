@@ -30,12 +30,12 @@ export const minhwaList: Minhwa[] = [
   },
   {
     id: "minhwa02",
-    title: "호토도",
+    title: "호작도",
     originalImage: "/minhwa/minhwa02-original.jpg",
     differenceImage: "/minhwa/minhwa02-difference-v3.webp",
-    shortDescription: "커다란 호랑이 뒤로 토끼와 소나무가 보이는 익살스러운 그림이에요.",
-    description: "민화 속 호랑이는 무섭기보다 재미있고 친근한 표정을 짓기도 해요. 굵은 줄무늬와 동그란 눈, 토끼의 모습을 찾아보세요.",
-    observationPoints: ["호랑이의 큰 눈", "검은 줄무늬", "토끼", "소나무", "커다란 발"],
+    shortDescription: "소나무 가지의 까치와 커다란 호랑이가 함께 있는 익살스러운 그림이에요.",
+    description: "호작도는 까치와 호랑이를 함께 그린 민화예요. 좋은 소식을 전하는 까치와 나쁜 기운을 물리치는 호랑이를 천천히 살펴보세요.",
+    observationPoints: ["호랑이의 큰 눈", "검은 줄무늬", "까치", "소나무", "커다란 발"],
     differences: fiveDifferences([{x:76,y:39,radius:6},{x:43,y:69,radius:7},{x:77,y:80,radius:7},{x:55,y:22,radius:6},{x:30,y:24,radius:6},{x:81,y:27,radius:6},{x:20,y:52,radius:6}]),
   },
   {
