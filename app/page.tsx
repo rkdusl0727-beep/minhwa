@@ -117,6 +117,7 @@ export default function HomePage() {
   const [speaking, setSpeaking] = useState(false);
   const [preparingPrint, setPreparingPrint] = useState(false);
   const [printImage, setPrintImage] = useState<string | null>(null);
+  const [coloringPreviewOpen, setColoringPreviewOpen] = useState(false);
   const selected = minhwaList.find((item) => item.id === selectedId) || minhwaList[0];
   const points = selected.differences;
 
@@ -146,16 +147,20 @@ export default function HomePage() {
     window.speechSynthesis.speak(utterance);
   };
 
-  const printColoringPage = async () => {
+  const openColoringPreview = async () => {
     if (preparingPrint) return;
     setPreparingPrint(true);
     try {
       const lineArt = await makeLineArt(selected.originalImage);
       setPrintImage(lineArt);
-      window.setTimeout(() => window.print(), 180);
+      setColoringPreviewOpen(true);
     } finally {
       setPreparingPrint(false);
     }
+  };
+
+  const printColoringPage = () => {
+    window.setTimeout(() => window.print(), 120);
   };
 
   const chooseArtwork = (id: string) => {
@@ -253,7 +258,7 @@ export default function HomePage() {
             <div className="look-question"><PngIcon name="eyes" /><strong>그림 속에서 무엇이 보이나요?</strong></div>
             <div className="intro-tools">
               <Button variant="outline" className="large-control" onClick={toggleNarration} aria-label={speaking ? "그림 설명 그만 듣기" : "그림 설명 음성으로 듣기"}><PngIcon name={speaking ? "sound-off" : "sound-on"} /> {speaking ? "그만 듣기" : "설명 듣기"}</Button>
-              <Button variant="outline" className="large-control" onClick={printColoringPage} disabled={preparingPrint} aria-label="선택한 그림을 색칠 도안으로 인쇄하기"><PngIcon name="paintbrush" /> {preparingPrint ? "색칠 그림 만드는 중" : "색칠 그림 인쇄"}</Button>
+              <Button variant="outline" className="large-control" onClick={openColoringPreview} disabled={preparingPrint} aria-label="선택한 그림의 색칠 도안 미리보기"><PngIcon name="paintbrush" /> {preparingPrint ? "색칠 그림 만드는 중" : "색칠 그림 미리보기"}</Button>
             </div>
             <Button className="primary-cta wide" onClick={startGame} aria-label="다른 곳 5개 찾기 시작">다른 곳 5개 찾기 <PngIcon name="arrow-right" /></Button>
           </div>
@@ -297,6 +302,22 @@ export default function HomePage() {
         <div className="celebration-actions"><Button className="primary-cta" onClick={goLearn}><PngIcon name="book" /> 민화 더 알아보기</Button><Button variant="outline" className="large-control" onClick={() => { setCelebrate(false); setScreen("select"); }}><PngIcon name="gallery" /> 다른 민화 찾기</Button><Button variant="ghost" className="large-control" onClick={startGame}><PngIcon name="reset" /> 다시 하기</Button></div>
       </DialogContent></Dialog>
       <TeacherEditor open={teacherOpen} onOpenChange={setTeacherOpen} />
+      <Dialog open={coloringPreviewOpen} onOpenChange={setColoringPreviewOpen}>
+        <DialogContent className="coloring-preview-dialog" showCloseButton={false}>
+          <button className="teacher-close" onClick={() => setColoringPreviewOpen(false)} aria-label="색칠 그림 미리보기 닫기"><PngIcon name="close" /></button>
+          <DialogHeader>
+            <DialogTitle>색칠 그림 미리보기</DialogTitle>
+            <DialogDescription>{selected.title} 도안을 확인한 뒤 인쇄해 주세요.</DialogDescription>
+          </DialogHeader>
+          <div className="coloring-preview-canvas">
+            {printImage && <img src={printImage} alt={`${selected.title} 색칠 도안 미리보기`} />}
+          </div>
+          <div className="coloring-preview-actions">
+            <Button className="primary-cta" onClick={printColoringPage}><PngIcon name="copy" /> 인쇄하기</Button>
+            <Button variant="outline" className="large-control" onClick={() => setColoringPreviewOpen(false)}><PngIcon name="close" /> 닫기</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
       <section className="print-sheet" aria-label={`${selected.title} 색칠 도안`}>
         <header><span>민화 색칠 놀이</span><h1>{selected.title}</h1></header>
         {printImage && <img src={printImage} alt={`${selected.title} 색칠 도안`} />}
