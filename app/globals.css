@@ -3,16 +3,23 @@
 @import "../vendor/shadcn-tailwind-4.13.0.css";
 
 @font-face {
-  font-family: "SchoolSafeTree";
-  src: url("/fonts/TTHakgyoansimNamuL.woff2") format("woff2");
-  font-weight: 300;
+  font-family: "CookieRun";
+  src: url("/fonts/CookieRun-Regular.woff") format("woff");
+  font-weight: 400;
   font-display: swap;
 }
 
 @font-face {
-  font-family: "SchoolSafeTree";
-  src: url("/fonts/TTHakgyoansimNamuR.woff2") format("woff2");
-  font-weight: 400;
+  font-family: "CookieRun";
+  src: url("/fonts/CookieRun-Bold.woff") format("woff");
+  font-weight: 700;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "CookieRun";
+  src: url("/fonts/CookieRun-Black.woff") format("woff");
+  font-weight: 900;
   font-display: swap;
 }
 
@@ -50,7 +57,7 @@
   --color-input: var(--input); --color-ring: var(--ring);
   --radius-sm: calc(var(--radius) - 6px); --radius-md: calc(var(--radius) - 3px);
   --radius-lg: var(--radius); --radius-xl: calc(var(--radius) + 6px);
-  --font-sans: "SchoolSafeTree", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+  --font-sans: "CookieRun", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
 }
 
 * { box-sizing: border-box; }
