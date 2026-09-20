@@ -17,19 +17,28 @@ const artworks = [
   ["minhwa10-original.jpg", [[49,66],[55,88],[55,8],[37,43],[70,36],[25,27],[80,73]]],
 ];
 
-const colors = ["#c93b49", "#168f86", "#6350a0", "#dc8325", "#32865b", "#c8477c", "#3376a8"];
+function softMask(size) {
+  return Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}">
+    <defs><radialGradient id="fade"><stop offset="0%" stop-color="white" stop-opacity="1"/><stop offset="58%" stop-color="white" stop-opacity=".95"/><stop offset="100%" stop-color="white" stop-opacity="0"/></radialGradient></defs>
+    <rect width="100%" height="100%" fill="url(#fade)"/>
+  </svg>`);
+}
 
-function motifSvg(size, color, variant) {
-  const center = size / 2;
-  const stroke = Math.max(2, Math.round(size * 0.026));
-  const common = `stroke="#49392e" stroke-width="${stroke}" stroke-linejoin="round" opacity=".9"`;
-  const shapes = [
-    `<g><circle cx="${center}" cy="${center}" r="${size*.27}" fill="${color}" ${common}/><circle cx="${center}" cy="${center}" r="${size*.09}" fill="#e9b945" opacity=".9"/></g>`,
-    `<g transform="rotate(-28 ${center} ${center})"><ellipse cx="${center}" cy="${center}" rx="${size*.34}" ry="${size*.19}" fill="${color}" ${common}/><path d="M${size*.25} ${center} Q${center} ${size*.43} ${size*.75} ${center}" fill="none" stroke="#e9d69b" stroke-width="${stroke*.65}" opacity=".8"/></g>`,
-    `<g><path d="M${center} ${size*.14} L${size*.61} ${size*.39} L${size*.87} ${center} L${size*.61} ${size*.61} L${center} ${size*.87} L${size*.39} ${size*.61} L${size*.13} ${center} L${size*.39} ${size*.39} Z" fill="${color}" ${common}/><circle cx="${center}" cy="${center}" r="${size*.08}" fill="#e9b945" opacity=".9"/></g>`,
-    `<g transform="rotate(18 ${center} ${center})"><rect x="${size*.17}" y="${size*.27}" width="${size*.66}" height="${size*.15}" rx="${size*.07}" fill="${color}" ${common}/><rect x="${size*.17}" y="${size*.58}" width="${size*.66}" height="${size*.15}" rx="${size*.07}" fill="${color}" ${common}/></g>`,
-  ];
-  return Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">${shapes[variant % shapes.length]}</svg>`);
+async function naturalPatch(sourcePath, area, variant) {
+  const extracted = await sharp(sourcePath).extract(area).toBuffer();
+  let editor = sharp(extracted);
+
+  if (variant === 0) editor = editor.flop().modulate({ saturation: 1.04, brightness: 1.01 });
+  if (variant === 1) editor = editor.flip().modulate({ saturation: .95, brightness: .98 });
+  if (variant === 2) editor = editor.rotate(180).modulate({ saturation: 1.03 });
+  if (variant === 3) editor = editor.modulate({ saturation: .42, brightness: 1.04 });
+  if (variant === 4) editor = editor.modulate({ hue: 24, saturation: .82, brightness: .78 });
+
+  return editor
+    .ensureAlpha()
+    .composite([{ input: softMask(area.width), blend: "dest-in" }])
+    .png()
+    .toBuffer();
 }
 
 for (let index = 0; index < artworks.length; index += 1) {
@@ -40,12 +49,18 @@ for (let index = 0; index < artworks.length; index += 1) {
   const height = metadata.height;
   if (!width || !height) throw new Error(`Could not read ${sourceName}`);
 
-  const motifSize = Math.max(32, Math.round(Math.min(width, height) * 0.085));
-  const overlays = points.slice(0, 5).map(([x, y], pointIndex) => ({
-    input: motifSvg(motifSize, colors[(index + pointIndex) % colors.length], pointIndex),
-    left: Math.max(0, Math.min(width - motifSize, Math.round(width * x / 100 - motifSize / 2))),
-    top: Math.max(0, Math.min(height - motifSize, Math.round(height * y / 100 - motifSize / 2))),
-  }));
+  const patchSize = Math.max(34, Math.round(Math.min(width, height) * 0.095));
+  const overlays = [];
+  for (let pointIndex = 0; pointIndex < 5; pointIndex += 1) {
+    const [x, y] = points[pointIndex];
+    const area = {
+      left: Math.max(0, Math.min(width - patchSize, Math.round(width * x / 100 - patchSize / 2))),
+      top: Math.max(0, Math.min(height - patchSize, Math.round(height * y / 100 - patchSize / 2))),
+      width: patchSize,
+      height: patchSize,
+    };
+    overlays.push({ input: await naturalPatch(sourcePath, area, pointIndex), left: area.left, top: area.top });
+  }
 
   const number = String(index + 1).padStart(2, "0");
   await sharp(sourcePath)
@@ -54,4 +69,4 @@ for (let index = 0; index < artworks.length; index += 1) {
     .toFile(path.join(imageDir, `minhwa${number}-difference-v3.webp`));
 }
 
-console.log("Created 10 clear difference boards without changing the originals.");
+console.log("Created 10 natural difference boards without changing the originals.");
