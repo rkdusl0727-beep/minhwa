@@ -41,7 +41,7 @@ for (let index = 0; index < artworks.length; index += 1) {
   if (!width || !height) throw new Error(`Could not read ${sourceName}`);
 
   const motifSize = Math.max(32, Math.round(Math.min(width, height) * 0.085));
-  const overlays = points.map(([x, y], pointIndex) => ({
+  const overlays = points.slice(0, 5).map(([x, y], pointIndex) => ({
     input: motifSvg(motifSize, colors[(index + pointIndex) % colors.length], pointIndex),
     left: Math.max(0, Math.min(width - motifSize, Math.round(width * x / 100 - motifSize / 2))),
     top: Math.max(0, Math.min(height - motifSize, Math.round(height * y / 100 - motifSize / 2))),
