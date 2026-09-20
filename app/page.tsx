@@ -9,7 +9,10 @@ import { DifferencePoint, minhwaList, talkQuestions } from "@/src/data/minhwa";
 
 type Screen = "home" | "select" | "intro" | "game" | "learn";
 type CompletionMap = Record<string, boolean>;
+type ArtworkTap = { x: number; y: number; width: number; height: number };
 const STORAGE_KEY = "minhwa-detective-completions";
+const TOUCH_PADDING_PERCENT = 1.5;
+const MIN_TOUCH_RADIUS_PX = 26;
 
 function PngIcon({ name, className = "" }: { name: string; className?: string }) {
   return <img className={`png-icon ${className}`.trim()} src={`/icons/${name}.png`} alt="" aria-hidden="true" draggable={false} />;
@@ -72,13 +75,12 @@ export default function HomePage() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
     setCompleted(next); playTone(soundOn, "complete"); setCelebrate(true);
   };
-  const handleArtTap = (event: React.PointerEvent<HTMLButtonElement>) => {
-    const rect = event.currentTarget.getBoundingClientRect();
-    const x = ((event.clientX - rect.left) / rect.width) * 100;
-    const y = ((event.clientY - rect.top) / rect.height) * 100;
+  const handleArtTap = ({ x, y, width, height }: ArtworkTap) => {
     const hit = points.findIndex((point, index) => {
       if (found.includes(index)) return false;
-      return Math.hypot(x - point.x, y - point.y) <= point.radius;
+      const radiusX = Math.max(point.radius + TOUCH_PADDING_PERCENT, (MIN_TOUCH_RADIUS_PX / width) * 100);
+      const radiusY = Math.max(point.radius + TOUCH_PADDING_PERCENT, (MIN_TOUCH_RADIUS_PX / height) * 100);
+      return Math.hypot((x - point.x) / radiusX, (y - point.y) / radiusY) <= 1;
     });
     if (hit >= 0) {
       const next = [...found, hit];
@@ -199,12 +201,26 @@ function BackButton({ label, onClick }: { label: string; onClick: () => void }) 
 }
 
 function ArtworkPanel({ label, image, alt, interactive = false, onTap, points = [], hintIndex = null, shake = false }: {
-  label: string; image: string; alt: string; interactive?: boolean; onTap?: (event: React.PointerEvent<HTMLButtonElement>) => void;
+  label: string; image: string; alt: string; interactive?: boolean; onTap?: (tap: ArtworkTap) => void;
   points?: DifferencePoint[]; hintIndex?: number | null; shake?: boolean;
 }) {
+  const imageRef = useRef<HTMLImageElement>(null);
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    const rect = imageRef.current?.getBoundingClientRect();
+    if (!rect || !onTap || rect.width <= 0 || rect.height <= 0) return;
+    const clientX = event.clientX;
+    const clientY = event.clientY;
+    if (clientX < rect.left || clientX > rect.right || clientY < rect.top || clientY > rect.bottom) return;
+    onTap({
+      x: ((clientX - rect.left) / rect.width) * 100,
+      y: ((clientY - rect.top) / rect.height) * 100,
+      width: rect.width,
+      height: rect.height,
+    });
+  };
   return <figure className="art-panel"><figcaption>{label}</figcaption><div className={`game-art ${shake ? "soft-shake" : ""}`}>
-    <img src={image} alt={alt} draggable={false} />
-    {interactive && <button className="tap-layer" onPointerDown={onTap} aria-label="다른 곳 찾기 그림, 달라 보이는 부분을 눌러 주세요">
+    <img ref={imageRef} src={image} alt={alt} draggable={false} />
+    {interactive && <button type="button" className="tap-layer" onClick={handleClick} aria-label="다른 곳 찾기 그림, 달라 보이는 부분을 눌러 주세요">
       {points.map((point, index) => hintIndex === index
         ? <span key={index} className="hint-glow" style={{ left: `${point.x}%`, top: `${point.y}%`, width: `${point.radius * 2}%`, aspectRatio: "1" }} /> : null)}
     </button>}
