@@ -14,64 +14,6 @@ const STORAGE_KEY = "minhwa-detective-completions";
 const TOUCH_PADDING_PERCENT = 1.5;
 const MIN_TOUCH_RADIUS_PX = 26;
 
-async function makeLineArt(source: string): Promise<string> {
-  const image = new Image();
-  image.decoding = "async";
-  image.src = source;
-  await image.decode();
-
-  const longestSide = 1600;
-  const scale = Math.min(1, longestSide / Math.max(image.naturalWidth, image.naturalHeight));
-  const width = Math.max(1, Math.round(image.naturalWidth * scale));
-  const height = Math.max(1, Math.round(image.naturalHeight * scale));
-  const canvas = document.createElement("canvas");
-  const context = canvas.getContext("2d", { willReadFrequently: true });
-  if (!context) throw new Error("색칠 도안을 만들 수 없습니다.");
-
-  canvas.width = width;
-  canvas.height = height;
-  context.fillStyle = "#ffffff";
-  context.fillRect(0, 0, width, height);
-  context.drawImage(image, 0, 0, width, height);
-  const sourcePixels = context.getImageData(0, 0, width, height);
-  const gray = new Float32Array(width * height);
-  for (let pixel = 0, index = 0; index < gray.length; pixel += 4, index += 1) {
-    gray[index] = sourcePixels.data[pixel] * .299 + sourcePixels.data[pixel + 1] * .587 + sourcePixels.data[pixel + 2] * .114;
-  }
-
-  const softened = new Float32Array(gray.length);
-  for (let y = 1; y < height - 1; y += 1) {
-    for (let x = 1; x < width - 1; x += 1) {
-      let sum = 0;
-      for (let offsetY = -1; offsetY <= 1; offsetY += 1) {
-        for (let offsetX = -1; offsetX <= 1; offsetX += 1) sum += gray[(y + offsetY) * width + x + offsetX];
-      }
-      softened[y * width + x] = sum / 9;
-    }
-  }
-
-  const output = context.createImageData(width, height);
-  output.data.fill(255);
-  const valueAt = (x: number, y: number) => softened[y * width + x];
-  for (let y = 2; y < height - 2; y += 1) {
-    for (let x = 2; x < width - 2; x += 1) {
-      const gx = -valueAt(x - 1, y - 1) + valueAt(x + 1, y - 1)
-        - 2 * valueAt(x - 1, y) + 2 * valueAt(x + 1, y)
-        - valueAt(x - 1, y + 1) + valueAt(x + 1, y + 1);
-      const gy = -valueAt(x - 1, y - 1) - 2 * valueAt(x, y - 1) - valueAt(x + 1, y - 1)
-        + valueAt(x - 1, y + 1) + 2 * valueAt(x, y + 1) + valueAt(x + 1, y + 1);
-      const ink = Math.hypot(gx, gy) > 52 ? 20 : 255;
-      const position = (y * width + x) * 4;
-      output.data[position] = ink;
-      output.data[position + 1] = ink;
-      output.data[position + 2] = ink;
-      output.data[position + 3] = 255;
-    }
-  }
-  context.putImageData(output, 0, 0);
-  return canvas.toDataURL("image/png");
-}
-
 function PngIcon({ name, className = "" }: { name: string; className?: string }) {
   return <img className={`png-icon ${className}`.trim()} src={`/icons/${name}.png`} alt="" aria-hidden="true" draggable={false} />;
 }
@@ -115,7 +57,6 @@ export default function HomePage() {
   const [teacherOpen, setTeacherOpen] = useState(false);
   const [questionIndex, setQuestionIndex] = useState(0);
   const [speaking, setSpeaking] = useState(false);
-  const [preparingPrint, setPreparingPrint] = useState(false);
   const [printImage, setPrintImage] = useState<string | null>(null);
   const [coloringPreviewOpen, setColoringPreviewOpen] = useState(false);
   const selected = minhwaList.find((item) => item.id === selectedId) || minhwaList[0];
@@ -147,16 +88,9 @@ export default function HomePage() {
     window.speechSynthesis.speak(utterance);
   };
 
-  const openColoringPreview = async () => {
-    if (preparingPrint) return;
-    setPreparingPrint(true);
-    try {
-      const lineArt = await makeLineArt(selected.originalImage);
-      setPrintImage(lineArt);
-      setColoringPreviewOpen(true);
-    } finally {
-      setPreparingPrint(false);
-    }
+  const openColoringPreview = () => {
+    setPrintImage(selected.coloringImage);
+    setColoringPreviewOpen(true);
   };
 
   const printColoringPage = () => {
@@ -257,7 +191,7 @@ export default function HomePage() {
           <div className="intro-copy"><span className="eyebrow">먼저 그림을 천천히 봐요</span><h1>{selected.title}</h1><p className="intro-summary">{selected.shortDescription}</p><p className="intro-description">{selected.description}</p>
             <div className="intro-tools">
               <Button variant="outline" className="large-control" onClick={toggleNarration} aria-label={speaking ? "그림 설명 그만 듣기" : "그림 설명 음성으로 듣기"}><PngIcon name={speaking ? "sound-off" : "sound-on"} /> {speaking ? "그만 듣기" : "설명 듣기"}</Button>
-              <Button variant="outline" className="large-control" onClick={openColoringPreview} disabled={preparingPrint} aria-label="선택한 그림의 색칠 도안 미리보기"><PngIcon name="paintbrush" /> {preparingPrint ? "색칠 그림 만드는 중" : "색칠 그림 미리보기"}</Button>
+              <Button variant="outline" className="large-control" onClick={openColoringPreview} aria-label="선택한 그림의 색칠 도안 미리보기"><PngIcon name="paintbrush" /> 색칠 그림 미리보기</Button>
             </div>
             <Button className="primary-cta wide" onClick={startGame} aria-label="다른 곳 5개 찾기 시작">다른 곳 5개 찾기 <PngIcon name="arrow-right" /></Button>
           </div>
