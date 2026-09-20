@@ -2,6 +2,20 @@
 @import "tw-animate-css";
 @import "../vendor/shadcn-tailwind-4.13.0.css";
 
+@font-face {
+  font-family: "SchoolSafeTree";
+  src: url("/fonts/TTHakgyoansimNamuL.woff2") format("woff2");
+  font-weight: 300;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "SchoolSafeTree";
+  src: url("/fonts/TTHakgyoansimNamuR.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+
 :root {
   --background: #f8f4e9;
   --foreground: #183b38;
@@ -36,12 +50,12 @@
   --color-input: var(--input); --color-ring: var(--ring);
   --radius-sm: calc(var(--radius) - 6px); --radius-md: calc(var(--radius) - 3px);
   --radius-lg: var(--radius); --radius-xl: calc(var(--radius) + 6px);
-  --font-sans: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+  --font-sans: "SchoolSafeTree", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
 }
 
 * { box-sizing: border-box; }
 html { background: var(--background); scroll-behavior: smooth; }
-body { margin: 0; background: var(--background); color: var(--foreground); font-family: var(--font-sans); font-size: 16px; }
+body { margin: 0; background: var(--background); color: var(--foreground); font-family: var(--font-sans); font-size: 16px; font-synthesis: weight; }
 button { font: inherit; }
 button:focus-visible, [role="button"]:focus-visible { outline: 4px solid #f0ad31; outline-offset: 3px; }
 img { max-width: 100%; }
@@ -134,7 +148,7 @@ img { max-width: 100%; }
 .art-panel figcaption { display: block; width: fit-content; margin: 0 auto 10px; padding: 8px 18px; border-radius: 99px; background: #eee7d8; font-size: 1rem; font-weight: 850; }
 .game-art { position: relative; display: grid; place-items: center; overflow: hidden; border: 9px solid #fffdf7; border-radius: 18px; background: #dfd6c3; box-shadow: 0 8px 28px rgba(45,57,49,.15); touch-action: manipulation; }
 .art-panel:first-child .game-art { outline: 3px solid #4b8e79; outline-offset: 2px; }
-.art-panel:last-child .game-art { outline: 3px solid #df8c39; outline-offset: 2px; }
+.art-panel:last-child .game-art { outline: 5px solid #df7139; outline-offset: 2px; box-shadow: 0 8px 28px rgba(45,57,49,.15), 0 0 0 8px rgba(255,210,133,.28); }
 .game-art > img { display: block; width: 100%; height: auto; user-select: none; -webkit-user-drag: none; }
 .tap-layer { position: absolute; inset: 0; width: 100%; height: 100%; padding: 0; border: 0; background: transparent; cursor: crosshair; touch-action: manipulation; }
 .found-ring, .hint-glow, .editor-ring { position: absolute; transform: translate(-50%,-50%); border-radius: 50%; pointer-events: none; }

@@ -167,7 +167,7 @@ export default function HomePage() {
       {screen === "game" && <section className="game-screen page-frame wide-frame">
         <div className="game-heading">
           <BackButton label="난이도 바꾸기" onClick={() => setScreen("difficulty")} />
-          <div><span className="eyebrow game-eyebrow"><PngIcon name={difficultyMeta[difficulty].icon} /> {difficultyMeta[difficulty].label}</span><h1>{selected.title}</h1><p>두 그림 중 어느 쪽을 눌러도 돼요!</p></div>
+          <div><span className="eyebrow game-eyebrow"><PngIcon name={difficultyMeta[difficulty].icon} /> {difficultyMeta[difficulty].label}</span><h1>{selected.title}</h1><p>오른쪽 그림에는 색과 모양이 확실히 달라진 곳이 있어요. 어느 쪽을 눌러도 돼요!</p></div>
           <div className="progress-pill" aria-live="polite"><span>찾은 곳</span><strong>{found.length} / {points.length}</strong></div>
         </div>
         <div className="progress-track" aria-hidden="true"><span style={{ width: `${(found.length / points.length) * 100}%` }} /></div>
