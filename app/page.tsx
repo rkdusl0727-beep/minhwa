@@ -136,8 +136,8 @@ export default function HomePage() {
           {minhwaList.map((item, index) => {
             const done = !!completed[item.id];
             return <button key={item.id} className="art-card" onClick={() => chooseArtwork(item.id)} aria-label={`${item.title} 살펴보기${done ? ", 완료함" : ""}`}>
-              <span className="card-image"><img src={item.originalImage} alt={`${item.title} 민화`} /></span>
               <span className="card-footer"><span className="card-title-row"><span className="card-number">{String(index + 1).padStart(2, "0")}</span><strong>{item.title}</strong></span>{done && <span className="done-badge"><PngIcon name="check" /> 찾아봤어요</span>}</span>
+              <span className="card-image"><img src={item.originalImage} alt={`${item.title} 민화`} /></span>
             </button>;
           })}
         </div>
