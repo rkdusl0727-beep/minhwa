@@ -255,7 +255,6 @@ export default function HomePage() {
         <div className="observation-layout">
           <div className="intro-image"><img src={selected.originalImage} alt={`${selected.title} 원본 민화`} /></div>
           <div className="intro-copy"><span className="eyebrow">먼저 그림을 천천히 봐요</span><h1>{selected.title}</h1><p className="intro-summary">{selected.shortDescription}</p><p className="intro-description">{selected.description}</p>
-            <div className="look-question"><PngIcon name="eyes" /><strong>그림 속에서 무엇이 보이나요?</strong></div>
             <div className="intro-tools">
               <Button variant="outline" className="large-control" onClick={toggleNarration} aria-label={speaking ? "그림 설명 그만 듣기" : "그림 설명 음성으로 듣기"}><PngIcon name={speaking ? "sound-off" : "sound-on"} /> {speaking ? "그만 듣기" : "설명 듣기"}</Button>
               <Button variant="outline" className="large-control" onClick={openColoringPreview} disabled={preparingPrint} aria-label="선택한 그림의 색칠 도안 미리보기"><PngIcon name="paintbrush" /> {preparingPrint ? "색칠 그림 만드는 중" : "색칠 그림 미리보기"}</Button>
