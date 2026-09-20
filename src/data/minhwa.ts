@@ -20,17 +20,17 @@ const fiveDifferences = (points: DifferencePoint[]): DifferencePoint[] => points
 export const minhwaList: Minhwa[] = [
   {
     id: "minhwa01",
-    title: "참외와 생쥐",
+    title: "수박과 들쥐",
     originalImage: "/minhwa/minhwa01-original.jpg",
     differenceImage: "/minhwa/minhwa01-difference-v3.webp",
-    shortDescription: "커다란 참외 곁에 생쥐와 나비, 꽃이 모여 있는 그림이에요.",
-    description: "작은 생명들이 참외밭에 모였어요. 둥근 참외의 무늬와 덩굴의 모양, 나비의 날개를 천천히 살펴보세요.",
+    shortDescription: "커다란 수박 곁에 들쥐와 나비, 꽃이 모여 있는 그림이에요.",
+    description: "작은 생명들이 수박밭에 모였어요. 둥근 수박의 무늬와 덩굴의 모양, 나비의 날개를 천천히 살펴보세요.",
     observationPoints: ["둥근 참외", "생쥐 두 마리", "나비", "가느다란 덩굴", "붉은 꽃"],
     differences: fiveDifferences([{x:48,y:77,radius:7},{x:76,y:88,radius:7},{x:60,y:19,radius:7},{x:18,y:68,radius:6},{x:87,y:34,radius:6},{x:52,y:35,radius:6},{x:29,y:20,radius:6}]),
   },
   {
     id: "minhwa02",
-    title: "호랑이와 토끼",
+    title: "호토도",
     originalImage: "/minhwa/minhwa02-original.jpg",
     differenceImage: "/minhwa/minhwa02-difference-v3.webp",
     shortDescription: "커다란 호랑이 뒤로 토끼와 소나무가 보이는 익살스러운 그림이에요.",
@@ -40,7 +40,7 @@ export const minhwaList: Minhwa[] = [
   },
   {
     id: "minhwa03",
-    title: "표범과 모란",
+    title: "범과 모란",
     originalImage: "/minhwa/minhwa03-original.webp",
     differenceImage: "/minhwa/minhwa03-difference-v3.webp",
     shortDescription: "향기로운 모란을 바라보는 표범과 나비가 그려져 있어요.",
@@ -50,7 +50,7 @@ export const minhwaList: Minhwa[] = [
   },
   {
     id: "minhwa04",
-    title: "꽃나무와 새",
+    title: "화조도",
     originalImage: "/minhwa/minhwa04-original.jpg",
     differenceImage: "/minhwa/minhwa04-difference-v3.webp",
     shortDescription: "꽃이 활짝 핀 나무에서 아름다운 새 두 마리가 쉬고 있어요.",
@@ -60,7 +60,7 @@ export const minhwaList: Minhwa[] = [
   },
   {
     id: "minhwa05",
-    title: "가지와 풀벌레",
+    title: "초충도 - 가지와 방아깨비",
     originalImage: "/minhwa/minhwa05-original.jpg",
     differenceImage: "/minhwa/minhwa05-difference-v3.webp",
     shortDescription: "가지 열매와 풀 사이에 작은 벌레와 나비가 숨어 있어요.",
@@ -70,7 +70,7 @@ export const minhwaList: Minhwa[] = [
   },
   {
     id: "minhwa06",
-    title: "연꽃과 물고기",
+    title: "연화어해도",
     originalImage: "/minhwa/minhwa06-original.jpg",
     differenceImage: "/minhwa/minhwa06-difference-v3.webp",
     shortDescription: "연꽃 아래에서 물고기 두 마리가 힘차게 헤엄치고 있어요.",
@@ -80,7 +80,7 @@ export const minhwaList: Minhwa[] = [
   },
   {
     id: "minhwa07",
-    title: "연꽃 한 포기",
+    title: "연화도",
     originalImage: "/minhwa/minhwa07-original.jpg",
     differenceImage: "/minhwa/minhwa07-difference-v3.webp",
     shortDescription: "연못에서 자란 연꽃과 연잎이 위로 길게 뻗어 있어요.",
@@ -90,7 +90,7 @@ export const minhwaList: Minhwa[] = [
   },
   {
     id: "minhwa08",
-    title: "매화와 물고기 항아리",
+    title: "기명절지도",
     originalImage: "/minhwa/minhwa08-original.jpg",
     differenceImage: "/minhwa/minhwa08-difference-v3.webp",
     shortDescription: "매화가 꽂힌 항아리 안에서 물고기가 파도를 오르고 있어요.",
@@ -100,7 +100,7 @@ export const minhwaList: Minhwa[] = [
   },
   {
     id: "minhwa09",
-    title: "모란과 새",
+    title: "화조도 - 모란과 새",
     originalImage: "/minhwa/minhwa09-original.jpg",
     differenceImage: "/minhwa/minhwa09-difference-v3.webp",
     shortDescription: "붉은 모란 사이에 색색의 새 두 마리가 나란히 앉아 있어요.",
@@ -110,7 +110,7 @@ export const minhwaList: Minhwa[] = [
   },
   {
     id: "minhwa10",
-    title: "연꽃 연못의 물고기",
+    title: "어해도",
     originalImage: "/minhwa/minhwa10-original.jpg",
     differenceImage: "/minhwa/minhwa10-difference-v3.webp",
     shortDescription: "연꽃 연못 위로 새가 날고 커다란 물고기가 헤엄쳐요.",

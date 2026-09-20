@@ -90,15 +90,16 @@ img { max-width: 100%; }
 .section-heading { display: flex; justify-content: space-between; align-items: end; gap: 32px; margin-bottom: 34px; }
 .section-heading h1, .center-heading h1, .learn-heading h1 { margin: 8px 0 0; font-size: clamp(2.2rem, 4vw, 4rem); line-height: 1.07; letter-spacing: -.045em; }
 .section-heading p, .center-heading p { margin: 0; color: #65746c; font-size: 1.1rem; font-weight: 650; }
-.art-grid { display: grid; grid-template-columns: repeat(5, minmax(0,1fr)); gap: 18px; }
+.art-grid { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 18px; }
 .art-card { position: relative; display: flex; flex-direction: column; min-width: 0; padding: 0; overflow: hidden; border: 1px solid #d8d0c1; border-radius: 22px; background: var(--art-beige); color: inherit; text-align: left; cursor: pointer; box-shadow: 0 6px 0 #e8dfcf; transition: transform .18s, box-shadow .18s; }
 .art-card:hover { transform: translateY(-5px); box-shadow: 0 11px 0 #e3d8c6; }
-.card-number { position: absolute; z-index: 2; top: 10px; left: 10px; display: grid; place-items: center; min-width: 42px; height: 32px; border-radius: 99px; background: rgba(24,59,56,.86); color: white; font-size: .84rem; font-weight: 850; }
+.card-number { display: grid; place-items: center; flex: 0 0 auto; min-width: 46px; height: 36px; border-radius: 99px; background: #183b38; color: white; font-size: .95rem; font-weight: 850; }
 .card-image { display: grid; place-items: center; height: clamp(180px, 24vw, 300px); padding: 14px; background: var(--art-beige); }
 .card-image img { width: 100%; height: 100%; object-fit: contain; transition: transform .25s; }
 .art-card:hover .card-image img { transform: scale(1.025); }
-.card-footer { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 78px; padding: 14px 15px; }
-.card-footer strong { font-size: 1rem; line-height: 1.25; }
+.card-footer { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 92px; padding: 16px; }
+.card-title-row { display: flex; align-items: center; min-width: 0; gap: 11px; }
+.card-footer strong { font-size: clamp(1.15rem,1.45vw,1.38rem); line-height: 1.25; word-break: keep-all; }
 .done-badge { display: inline-flex; gap: 3px; align-items: center; flex-shrink: 0; padding: 6px 8px; border-radius: 99px; background: #e0f0e8; color: #13645e; font-size: .74rem; font-weight: 800; }
 .done-badge .png-icon { width: 15px; height: 15px; }
 
@@ -223,7 +224,10 @@ img { max-width: 100%; }
   .art-window-small { width: 40%; }
   .art-grid { gap: 10px; }
   .card-image { height: 190px; padding: 8px; }
-  .card-footer { min-height: 86px; padding: 12px; align-items: flex-start; flex-direction: column; }
+  .card-footer { min-height: 104px; padding: 12px; align-items: flex-start; flex-direction: column; }
+  .card-title-row { gap: 8px; }
+  .card-number { min-width: 40px; height: 32px; font-size: .85rem; }
+  .card-footer strong { font-size: 1.08rem; }
   .done-badge { font-size: .7rem; }
   .intro-image, .learn-image { min-height: 390px; padding: 12px; }
   .game-heading { gap: 10px; }

@@ -124,7 +124,7 @@ export default function HomePage() {
           <Button className="primary-cta" onClick={() => setScreen("select")} aria-label="민화 놀이 시작하기">놀이 시작 <PngIcon name="arrow-right" /></Button>
         </div>
         <div className="home-art" aria-label="민화 미리보기">
-          <div className="art-window art-window-main"><img src={minhwaList[0].originalImage} alt="참외와 생쥐 민화" /></div>
+          <div className="art-window art-window-main"><img src={minhwaList[0].originalImage} alt="수박과 들쥐 그림" /></div>
           <div className="art-window art-window-small"><img src={minhwaList[2].originalImage} alt="표범과 모란 민화" /></div>
           <span className="look-ring ring-one" aria-hidden="true" /><span className="look-ring ring-two" aria-hidden="true" />
         </div>
@@ -136,9 +136,8 @@ export default function HomePage() {
           {minhwaList.map((item, index) => {
             const done = !!completed[item.id];
             return <button key={item.id} className="art-card" onClick={() => chooseArtwork(item.id)} aria-label={`${item.title} 살펴보기${done ? ", 완료함" : ""}`}>
-              <span className="card-number">{String(index + 1).padStart(2, "0")}</span>
               <span className="card-image"><img src={item.originalImage} alt={`${item.title} 민화`} /></span>
-              <span className="card-footer"><strong>{item.title}</strong>{done && <span className="done-badge"><PngIcon name="check" /> 찾아봤어요</span>}</span>
+              <span className="card-footer"><span className="card-title-row"><span className="card-number">{String(index + 1).padStart(2, "0")}</span><strong>{item.title}</strong></span>{done && <span className="done-badge"><PngIcon name="check" /> 찾아봤어요</span>}</span>
             </button>;
           })}
         </div>
