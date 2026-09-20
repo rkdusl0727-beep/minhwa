@@ -36,7 +36,7 @@ export const minhwaList: Minhwa[] = [
     shortDescription: "소나무 가지의 까치와 커다란 호랑이가 함께 있는 익살스러운 그림이에요.",
     description: "호작도는 까치와 호랑이를 함께 그린 그림이에요. 옛사람들은 까치가 반가운 소식을 전하고, 호랑이가 나쁜 기운을 물리친다고 생각했어요. 무서운 호랑이인데도 둥근 눈과 커다란 발이 익살스럽게 보여요.",
     observationPoints: ["호랑이의 큰 눈", "검은 줄무늬", "까치", "소나무", "커다란 발"],
-    differences: fiveDifferences([{x:78,y:38,radius:8},{x:63,y:9,radius:9},{x:88,y:69,radius:8},{x:67,y:44,radius:8},{x:58,y:65,radius:9}]),
+    differences: fiveDifferences([{x:78,y:38,radius:8},{x:63,y:9,radius:9},{x:80,y:76,radius:10},{x:72,y:58,radius:9},{x:58,y:65,radius:9}]),
   },
   {
     id: "minhwa03",
