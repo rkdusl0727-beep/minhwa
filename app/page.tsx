@@ -173,13 +173,18 @@ export default function HomePage() {
     setCompleted(next); playTone(soundOn, "complete"); setCelebrate(true);
   };
   const handleArtTap = ({ x, y, width, height }: ArtworkTap) => {
-    const hit = points.findIndex((point, index) => {
+    const hitOrder = hintIndex === null
+      ? points.map((_, index) => index)
+      : [hintIndex, ...points.map((_, index) => index).filter((index) => index !== hintIndex)];
+    const hit = hitOrder.find((index) => {
+      const point = points[index];
       if (found.includes(index)) return false;
-      const radiusX = Math.max(point.radius + TOUCH_PADDING_PERCENT, (MIN_TOUCH_RADIUS_PX / width) * 100);
-      const radiusY = Math.max(point.radius + TOUCH_PADDING_PERCENT, (MIN_TOUCH_RADIUS_PX / height) * 100);
+      const hintPadding = index === hintIndex ? 3 : 0;
+      const radiusX = Math.max(point.radius + TOUCH_PADDING_PERCENT + hintPadding, (MIN_TOUCH_RADIUS_PX / width) * 100);
+      const radiusY = Math.max(point.radius + TOUCH_PADDING_PERCENT + hintPadding, (MIN_TOUCH_RADIUS_PX / height) * 100);
       return Math.hypot((x - point.x) / radiusX, (y - point.y) / radiusY) <= 1;
     });
-    if (hit >= 0) {
+    if (hit !== undefined) {
       const next = [...found, hit];
       setFound(next); setHintIndex(null); setGentleMessage(false); playTone(soundOn, "correct");
       if (next.length === points.length) window.setTimeout(markComplete, 420);
@@ -258,13 +263,13 @@ export default function HomePage() {
       {screen === "game" && <section className="game-screen page-frame wide-frame">
         <div className="game-heading">
           <BackButton label="그림 다시 보기" onClick={() => setScreen("intro")} />
-          <div><span className="eyebrow game-eyebrow"><PngIcon name="hand-tap" /> 다른 곳 5개 찾기</span><h1>{selected.title}</h1><p>색과 모양이 분명히 달라진 곳을 찾아보세요. 어느 쪽을 눌러도 돼요!</p></div>
+          <div><span className="eyebrow game-eyebrow"><PngIcon name="hand-tap" /> 다른 곳 5개 찾기</span><h1>{selected.title}</h1><p>원래 그림과 비교해 보고, 오른쪽 다른 그림에서 달라진 곳을 눌러요.</p></div>
           <div className="progress-pill" aria-live="polite"><span>찾은 곳</span><strong>{found.length} / {points.length}</strong></div>
         </div>
         <div className="progress-track" aria-hidden="true"><span style={{ width: `${(found.length / points.length) * 100}%` }} /></div>
         <div className="game-grid">
-          <ArtworkPanel label="원래 그림 · 여기도 눌러요" image={selected.originalImage} alt={`${selected.title} 원래 그림`} interactive onTap={handleArtTap} points={points} hintIndex={hintIndex} shake={gentleMessage} />
-          <ArtworkPanel label="다른 그림 · 여기도 눌러요" image={selected.differenceImage} alt={`${selected.title} 다른 그림`} interactive onTap={handleArtTap} points={points} hintIndex={hintIndex} shake={gentleMessage} />
+          <ArtworkPanel label="원래 그림 · 살펴봐요" image={selected.originalImage} alt={`${selected.title} 원래 그림`} />
+          <ArtworkPanel label="다른 그림 · 여기를 눌러요" image={selected.differenceImage} alt={`${selected.title} 다른 그림`} interactive onTap={handleArtTap} points={points} hintIndex={hintIndex} shake={gentleMessage} />
         </div>
         <div className="game-controls">
           <Button variant="outline" className="large-control" onClick={showHint} disabled={hintsLeft === 0 || found.length === points.length} aria-label={`힌트 보기, ${hintsLeft}개 남음`}><PngIcon name="lightbulb" /> 힌트 <span className="control-count">{hintsLeft}</span></Button>
@@ -310,7 +315,8 @@ function ArtworkPanel({ label, image, alt, interactive = false, onTap, points = 
   points?: DifferencePoint[]; hintIndex?: number | null; shake?: boolean;
 }) {
   const imageRef = useRef<HTMLImageElement>(null);
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const handleTap = (event: React.PointerEvent<HTMLButtonElement>) => {
+    event.preventDefault();
     const rect = imageRef.current?.getBoundingClientRect();
     if (!rect || !onTap || rect.width <= 0 || rect.height <= 0) return;
     const clientX = event.clientX;
@@ -325,7 +331,7 @@ function ArtworkPanel({ label, image, alt, interactive = false, onTap, points = 
   };
   return <figure className="art-panel"><figcaption>{label}</figcaption><div className={`game-art ${shake ? "soft-shake" : ""}`}>
     <img ref={imageRef} src={image} alt={alt} draggable={false} />
-    {interactive && <button type="button" className="tap-layer" onClick={handleClick} aria-label="다른 곳 찾기 그림, 달라 보이는 부분을 눌러 주세요">
+    {interactive && <button type="button" className="tap-layer" onPointerDown={handleTap} aria-label="다른 그림에서 달라 보이는 부분을 눌러 주세요">
       {points.map((point, index) => hintIndex === index
         ? <span key={index} className="hint-glow" style={{ left: `${point.x}%`, top: `${point.y}%`, width: `${point.radius * 2}%`, aspectRatio: "1" }} /> : null)}
     </button>}
