@@ -129,7 +129,8 @@ export default function HomePage() {
   };
 
   const printColoringPage = () => {
-    window.setTimeout(() => window.print(), 120);
+    window.focus();
+    window.print();
   };
 
   const chooseArtwork = (id: string) => {
