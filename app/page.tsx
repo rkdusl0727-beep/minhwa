@@ -173,7 +173,6 @@ export default function HomePage() {
     if (!unseen.length) return;
     const index = unseen[Math.floor(Math.random() * unseen.length)];
     setHintIndex(index); setHintsLeft((value) => value - 1);
-    window.setTimeout(() => setHintIndex((current) => current === index ? null : current), 2000);
   };
   const goLearn = () => {
     setQuestionIndex(Math.floor(Math.random() * talkQuestions.length));
