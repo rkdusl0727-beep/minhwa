@@ -44,6 +44,39 @@ function playTone(enabled: boolean, kind: "correct" | "complete") {
   oscillator.stop(context.currentTime + (kind === "correct" ? .22 : .45));
 }
 
+function naturalKoreanVoice(voices: SpeechSynthesisVoice[]) {
+  const koreanVoices = voices.filter((voice) => voice.lang.toLowerCase().startsWith("ko"));
+  const qualityScore = (voice: SpeechSynthesisVoice) => {
+    const name = `${voice.name} ${voice.voiceURI}`.toLowerCase();
+    if (name.includes("natural")) return 100;
+    if (name.includes("google")) return 90;
+    if (name.includes("premium")) return 80;
+    if (name.includes("enhanced")) return 75;
+    if (name.includes("siri")) return 70;
+    if (/yuna|sunhi|inj(o|oo)n|heami/.test(name)) return 65;
+    return voice.localService ? 20 : 10;
+  };
+  return koreanVoices.sort((left, right) => qualityScore(right) - qualityScore(left))[0];
+}
+
+async function loadSpeechVoices() {
+  const synthesis = window.speechSynthesis;
+  const available = synthesis.getVoices();
+  if (available.length) return available;
+  await new Promise<void>((resolve) => {
+    let settled = false;
+    const finish = () => {
+      if (settled) return;
+      settled = true;
+      synthesis.removeEventListener("voiceschanged", finish);
+      resolve();
+    };
+    synthesis.addEventListener("voiceschanged", finish, { once: true });
+    window.setTimeout(finish, 700);
+  });
+  return synthesis.getVoices();
+}
+
 export default function HomePage() {
   const [screen, setScreen] = useState<Screen>("home");
   const [selectedId, setSelectedId] = useState(minhwaList[0].id);
@@ -69,18 +102,20 @@ export default function HomePage() {
     setSpeaking(false);
   }, [selectedId, screen]);
 
-  const toggleNarration = () => {
+  const toggleNarration = async () => {
     if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
     if (window.speechSynthesis.speaking || speaking) {
       window.speechSynthesis.cancel();
       setSpeaking(false);
       return;
     }
-    const utterance = new SpeechSynthesisUtterance(`${selected.title}. ${selected.description}`);
+    const voices = await loadSpeechVoices();
+    const utterance = new SpeechSynthesisUtterance(`${selected.title}.\n${selected.description}`);
     utterance.lang = "ko-KR";
-    utterance.rate = .86;
-    utterance.pitch = 1.05;
-    const koreanVoice = window.speechSynthesis.getVoices().find((voice) => voice.lang.toLowerCase().startsWith("ko"));
+    utterance.rate = .94;
+    utterance.pitch = 1;
+    utterance.volume = 1;
+    const koreanVoice = naturalKoreanVoice(voices);
     if (koreanVoice) utterance.voice = koreanVoice;
     utterance.onend = () => setSpeaking(false);
     utterance.onerror = () => setSpeaking(false);
@@ -207,7 +242,7 @@ export default function HomePage() {
         <div className="progress-track" aria-hidden="true"><span style={{ width: `${(found.length / points.length) * 100}%` }} /></div>
         <div className="game-grid">
           <ArtworkPanel label="원래 그림 · 살펴봐요" image={selected.originalImage} alt={`${selected.title} 원래 그림`} />
-          <ArtworkPanel label="다른 그림 · 여기를 눌러요" image={selected.differenceImage} alt={`${selected.title} 다른 그림`} interactive onTap={handleArtTap} points={points} hintIndex={hintIndex} shake={gentleMessage} />
+          <ArtworkPanel label="다른 그림 · 여기를 눌러요" image={selected.differenceImage} alt={`${selected.title} 다른 그림`} interactive onTap={handleArtTap} points={points} found={found} hintIndex={hintIndex} shake={gentleMessage} />
         </div>
         <div className="game-controls">
           <Button variant="outline" className="large-control" onClick={showHint} disabled={hintsLeft === 0 || found.length === points.length} aria-label={`힌트 보기, ${hintsLeft}개 남음`}><PngIcon name="lightbulb" /> 힌트 <span className="control-count">{hintsLeft}</span></Button>
@@ -264,9 +299,9 @@ function BackButton({ label, onClick }: { label: string; onClick: () => void }) 
   return <button className="back-button" onClick={onClick}><PngIcon name="arrow-left" /> {label}</button>;
 }
 
-function ArtworkPanel({ label, image, alt, interactive = false, onTap, points = [], hintIndex = null, shake = false }: {
+function ArtworkPanel({ label, image, alt, interactive = false, onTap, points = [], found = [], hintIndex = null, shake = false }: {
   label: string; image: string; alt: string; interactive?: boolean; onTap?: (tap: ArtworkTap) => void;
-  points?: DifferencePoint[]; hintIndex?: number | null; shake?: boolean;
+  points?: DifferencePoint[]; found?: number[]; hintIndex?: number | null; shake?: boolean;
 }) {
   const imageRef = useRef<HTMLImageElement>(null);
   const handleTap = (event: React.PointerEvent<HTMLButtonElement>) => {
@@ -286,6 +321,11 @@ function ArtworkPanel({ label, image, alt, interactive = false, onTap, points = 
   return <figure className="art-panel"><figcaption>{label}</figcaption><div className={`game-art ${shake ? "soft-shake" : ""}`}>
     <img ref={imageRef} src={image} alt={alt} draggable={false} />
     {interactive && <button type="button" className="tap-layer" onPointerDown={handleTap} aria-label="다른 그림에서 달라 보이는 부분을 눌러 주세요">
+      {found.map((index) => {
+        const point = points[index];
+        const circleSize = Math.max(9, Math.min(point.radius * 1.55, 15));
+        return <span key={`found-${index}`} className="answer-ring" style={{ left: `${point.x}%`, top: `${point.y}%`, width: `${circleSize}%`, aspectRatio: "1" }} />;
+      })}
       {points.map((point, index) => hintIndex === index
         ? <span key={index} className="hint-glow" style={{ left: `${point.x}%`, top: `${point.y}%`, width: `${point.radius * 2}%`, aspectRatio: "1" }} /> : null)}
     </button>}
