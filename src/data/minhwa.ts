@@ -23,7 +23,7 @@ export const minhwaList: Minhwa[] = [
     id: "minhwa01",
     title: "수박과 들쥐",
     originalImage: "/minhwa/minhwa01-original.jpg",
-    differenceImage: "/minhwa/minhwa01-difference-v5.webp",
+    differenceImage: "/minhwa/minhwa01-difference-v6.png",
     coloringImage: "/minhwa/minhwa01-coloring-v2.png",
     shortDescription: "커다란 수박 곁에서 들쥐 두 마리가 먹이를 찾고, 나비가 살랑살랑 날아다녀요.",
     description: "이 그림은 풀과 벌레를 함께 그린 초충도의 한 장이에요. 둥근 수박과 수박을 파먹는 들쥐, 날아다니는 나비를 자세히 그렸어요. 옛사람들은 수박의 많은 씨와 들쥐를 보며 먹을 것이 넉넉하고 가족이 건강하기를 바랐어요.",
